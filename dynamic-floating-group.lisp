@@ -1,4 +1,5 @@
 (in-package #:stumpwm)
+(load "./util.lisp")
 
 (defstruct dyn-order :window :free)
 ;; (dyn-order-free (make-dyn-order :window 1 :free t))
@@ -129,38 +130,11 @@
                      :width (round (/ sw 2))
                      :height (round (/ sh (- N 1))))))))))
 
-(defun rotate-list (xs &optional opposite)
-  "Rotate the list immutably."
-  (if opposite
-      (concatenate 'list (cdr xs) (list (car xs)))
-      (concatenate 'list (last xs) (butlast xs))))
-
 (defun rotate-window-list (&optional (group (current-group)) opposite)
   (let ((dyno (dyn-float-group-dyn-order group)))
     ;; (setf dyno (rotate-list dyno)) ;; TODO Use symbol-microlet instead
     (setf (dyn-float-group-dyn-order group) (rotate-list dyno opposite)) ;; FIXME ugly workaround.
     (re-tile group)))
-
-(defun permute-at (ring n)
-  "Pure function that permutes the nth and the (n+1)th element of
-RING."
-  ;; ((0 1 2 3 4 5) 3) => (0 1 2 4 3 5)
-  ;; ((0 1 2 3 4 5) 5) => (5 1 2 3 4 0)
-  (when (and (listp ring)
-             (not (null ring)))
-    (let* ((l (length ring))
-           (n (mod n l)))
-      (when (>= l 2)
-        (if (= n (- l 1))
-            (concatenate 'list
-                         (last ring)
-                         (butlast (cdr ring))
-                         (list (car ring)))
-            (concatenate 'list
-                         (subseq ring 0 n)
-                         (list (nth (mod (+ n 1) l) ring))
-                         (list (nth (mod (+ n 0) l) ring))
-                         (subseq ring (+ n 2))))))))
 
 (defun permute-window-list (&optional opposite
                               (group (current-group))
