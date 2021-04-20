@@ -1,5 +1,5 @@
-(in-package #:stumpwm)
 (load "./util.lisp")
+(in-package #:stumpwm)
 
 (defstruct dyn-order :window :free)
 ;; (dyn-order-free (make-dyn-order :window 1 :free t))
