@@ -1,20 +1,3 @@
-;; TODO
-;;
-;; (X) make every function default at group = (current-group).
-;; make every function check if input group is a dyn-float-group.
-;;
-;; ( ) Handle the case when windows are moving out and in to the
-;; group. Currently, moving a window from dyn-float-group to a
-;; tile-group causes error. Also, moving a window from another
-;; group to a dyn-float-group causes an error.
-;;
-;; ( ) Free a window when it is controlled my mouse.
-;;
-;; ( ) Add a function to print the dyn-order (state) of the
-;; (current) group, in order to make the development easier.
-;;
-;; ( ) Emacs drop-down window.
-
 (in-package #:stumpwm)
 
 (defstruct dyn-order :window :free)
