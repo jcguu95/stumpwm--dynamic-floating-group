@@ -1,0 +1,4 @@
+* StumpWM - Dynamic Floating Group
+
+Usage: connect StumpWM to swank/slynk, and evaluate the file in
+the repl.
