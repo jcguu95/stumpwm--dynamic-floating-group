@@ -108,9 +108,9 @@
 
 (defun toggle-freeness-current-window (&optional (window (current-window))
                                          (group (current-group)))
-  ;; TODO make it more explicit.. maybe need to make the window
-  ;; smaller or something. also, when it goes back ,ti should go
-  ;; from the bottoom.
+  ;; TODO make the freed window more explicit.. maybe need to
+  ;; make the window smaller or something. also, when it goes
+  ;; back it should go to the bottom of the stack.
   (if (eq (dyn-order-free (current-window+ group)) t)
       (setf (dyn-order-free (current-window+ group)) nil)
       (setf (dyn-order-free (current-window+ group)) t))
@@ -151,7 +151,8 @@
 (defun rotate-window-list (&optional (group (current-group)) opposite)
   (let ((dyno (dyn-float-group-dyn-order group)))
     ;; (setf dyno (rotate-list dyno)) ;; TODO Use symbol-microlet instead
-    (setf (dyn-float-group-dyn-order group) (rotate-list dyno opposite)) ;; FIXME ugly workaround.
+    (setf (dyn-float-group-dyn-order group)
+          (rotate-list dyno opposite)) ;; FIXME ugly workaround.
     (re-tile group)))
 
 (defun permute-window-list (&optional opposite
