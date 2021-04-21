@@ -105,7 +105,8 @@
                    do (setf (win+-free w+) t))
              (re-tile group))))
 
-(defun unfree-all (&optional (group (current-group)))
+(defcommand unfree-all
+    (&optional (group (current-group))) ()
   (if (not (dyn-float-group-p group))
       (error "GROUP must be of type DYN-FLOAT-GROUP.")
       (progn
@@ -124,21 +125,21 @@
                 do (setf (win+-free w+) t))
         (re-tile group))))
 
-(defun unfree-window (&optional (window (current-window))
-                        (group (current-group)))
-  (if (not (dyn-float-group-p group))
-      (error "GROUP must be of type DYN-FLOAT-GROUP.")
-      (progn
-        (symbol-macrolet ((dyno (dyn-float-group-dyn-order group)))
-          (loop for w+ in dyno
-                do (when (equal window (win+-window w+))
-                     (progn
-                       (deletef dyno w+)
-                       (setf (win+-free w+) nil)
-                       (if (null dyno)
-                           (setf dyno (list w+))
-                           (push w+ (cdr (last dyno))))))))
-        (re-tile group))))
+(defcommand unfree-window
+    (&optional (window (current-window)) (group (current-group))) ()
+    (if (not (dyn-float-group-p group))
+        (error "GROUP must be of type DYN-FLOAT-GROUP.")
+        (progn
+          (symbol-macrolet ((dyno (dyn-float-group-dyn-order group)))
+            (loop for w+ in dyno
+                  do (when (equal window (win+-window w+))
+                       (progn
+                         (deletef dyno w+)
+                         (setf (win+-free w+) nil)
+                         (if (null dyno)
+                             (setf dyno (list w+))
+                             (push w+ (cdr (last dyno))))))))
+          (re-tile group))))
 
 (defun toggle-freeness-current-window (&optional (window (current-window))
                                          (group (current-group)))
@@ -189,21 +190,24 @@
                            :width (round (/ sw 2))
                            :height (round (/ sh (- N 1))))))))))))
 
-(defun rotate-window-list (&optional (group (current-group)) opposite)
-  (if (not (dyn-float-group-p group))
-      (error "GROUP must be of type DYN-FLOAT-GROUP.")
-      (flet ((rotate-list (xs &optional opposite)
-               "An adhoc pure function that rotates the list."
-               (if opposite
-                   (concatenate 'list (cdr xs) (list (car xs)))
-                   (concatenate 'list (last xs) (butlast xs)))))
-        (symbol-macrolet ((dyno (dyn-float-group-dyn-order group)))
-          (setf dyno (rotate-list dyno opposite))
-          (re-tile group)))))
+(defcommand rotate-window-list
+    (&optional (group (current-group)) opposite) ()
+    (if (not (dyn-float-group-p group))
+        (error "GROUP must be of type DYN-FLOAT-GROUP.")
+        (flet ((rotate-list (xs &optional opposite)
+                 "An adhoc pure function that rotates the list."
+                 (if opposite
+                     (concatenate 'list (cdr xs) (list (car xs)))
+                     (concatenate 'list (last xs) (butlast xs)))))
+          (symbol-macrolet ((dyno (dyn-float-group-dyn-order group)))
+            (setf dyno (rotate-list dyno opposite))
+            (re-tile group)))))
 
-(defun permute-window-list (&optional opposite
-                              (group (current-group))
-                              (n (current-window-position group)))
+(defcommand permute-window-list
+    (&optional opposite (group (current-group))
+     (n (current-window-position group)))
+    ()
+
   (if (not (dyn-float-group-p group))
       (error "GROUP must be of type DYN-FLOAT-GROUP.")
       (flet ((permute-at (ring n)
@@ -225,12 +229,12 @@ the (n+1)th element of RING."
                                       (subseq ring 0 n)
                                       (list (nth (mod (+ n 1) l) ring))
                                       (list (nth (mod (+ n 0) l) ring))
-                                      (subseq ring (+ n 2))))))))))
-      (progn
-        (when opposite (setf n (- n 1)))
-        (symbol-macrolet ((dyno (dyn-float-group-dyn-order group)))
-          (setf dyno (permute-at dyno n))
-          (re-tile group)))))
+                                      (subseq ring (+ n 2)))))))))
+        (progn
+          (when opposite (setf n (- n 1)))
+          (symbol-macrolet ((dyno (dyn-float-group-dyn-order group)))
+            (setf dyno (permute-at dyno n))
+            (re-tile group))))))
 
 (defcommand gnew-dyn-float (name) ((:rest "Group Name: "))
   "Create a new dynamic floating group named NAME."
