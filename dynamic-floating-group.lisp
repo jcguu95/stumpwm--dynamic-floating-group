@@ -163,20 +163,16 @@
                      :height (round (/ sh (- N 1))))))))))
 
 (defun rotate-window-list (&optional (group (current-group)) opposite)
-  (let ((dyno (dyn-float-group-dyn-order group)))
-    ;; (setf dyno (rotate-list dyno)) ;; TODO Use symbol-microlet instead
-    (setf (dyn-float-group-dyn-order group)
-          (rotate-list dyno opposite)) ;; FIXME ugly workaround.
+  (symbol-macrolet ((dyno (dyn-float-group-dyn-order group)))
+    (setf dyno (rotate-list dyno opposite))
     (re-tile group)))
 
 (defun permute-window-list (&optional opposite
                               (group (current-group))
                               (n (current-window-position group)))
   (when opposite (setf n (- n 1)))
-  (let ((dyno (dyn-float-group-dyn-order group)))
-    ;; (setf dyno (rotate-list dyno)) ;; TODO Use symbol-microlet instead
-    (setf (dyn-float-group-dyn-order group)
-          (permute-at dyno n)) ;; FIXME ugly workaround.
+  (symbol-macrolet ((dyno (dyn-float-group-dyn-order group)))
+    (setf dyno (permute-at dyno n))
     (re-tile group)))
 
 (defcommand gnew-dyn-float (name) ((:rest "Group Name: "))
