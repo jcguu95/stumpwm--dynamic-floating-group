@@ -15,7 +15,7 @@ the repl.
 
 + (X) Free a window when it is controlled my mouse.
 
-+ ( ) Add a function to print the dyn-order (state) of the
++ (X) Add a function to print the dyn-order (state) of the
   (current) group, in order to make the development easier.
 
 + ( ) Emacs drop-down window.
