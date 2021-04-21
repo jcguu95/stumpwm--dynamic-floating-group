@@ -1,9 +1,9 @@
-* StumpWM - Dynamic Floating Group
+# StumpWM - Dynamic Floating Group
 
 Usage: connect StumpWM to swank/slynk, and evaluate the file in
 the repl.
 
-** TODOs
+## TODOs
 
 + [X] make every function default at group = (current-group). make every function check if input group is a dyn-float-group.
 
@@ -11,7 +11,7 @@ the repl.
 
 + [X] Add a function to print the dyn-order (state) of the (current) group, in order to make the development easier.
 
-+ [ ] =#'re-tile= should respect modeline and boarder.. or even gap
++ [ ] `#'re-tile` should respect modeline and boarder.. or even gap
   in the future Waiting for the fix for a related issue for
   general floating group: https://github.com/stumpwm/stumpwm/issues/864
 
@@ -19,15 +19,20 @@ the repl.
 
   + Invoke an emacs window with customized frame.
 
-  #+begin_src shell
+  ```
     emacsclient -c -F '((name . "floating") (width . 150) (height . 10))' -e '(ivy-read "hi" (list (quote a)))'
-  #+end_src
+  ```
 
-  + See [[https://babbagefiles.xyz/equake-elisp-console/][=equake=]].
+  + See [`equake`](https://babbagefiles.xyz/equake-elisp-console/).
 
-** Related issues
+## Related issues
 
-+ While moving a floating window from a floating group =g1= to
-  another group =g2=, the window isn't removed immediately from =g1=
-  until the user switch focus to =g2=. This is a separate issue,
-  and has been reported [[https://github.com/stumpwm/stumpwm/issues/879][here]].
++ While moving a floating window from a floating group `g1` to another group
+  `g2`, the window isn't removed immediately from `g1` until the user switch
+  focus to `g2`. This is a separate issue, and has been reported
+  [here](https://github.com/stumpwm/stumpwm/issues/879).
+
+## Demo
+
+![GIF Demo](img/demo.gif)
+
