@@ -7,24 +7,21 @@ the repl.
 
 + [X] make every function default at group = (current-group). make every function check if input group is a dyn-float-group.
 
-+ [?] Handle the case when windows are moving out and in to the
-  group. Currently, moving a window from dyn-float-group to a
-  tile-group causes error. Also, moving a window from another
-  group to a dyn-float-group causes an error.
-
-  + This issue disappears at some point. There's still a little
-    bug however, which has been presented for the floating-group.
-    Namely, moving a window from a float group to another does
-    not stop the window being presented in the "from-group".
-
 + [X] Free a window when it is controlled my mouse.
 
 + [X] Add a function to print the dyn-order (state) of the (current) group, in order to make the development easier.
 
++ [ ] =#'re-tile= should respect modeline and boarder.. or even gap
+  in the future Waiting for the fix for a related issue for
+  general floating group: https://github.com/stumpwm/stumpwm/issues/864
+
 + [ ] Emacs drop-down window.
 
-  + =emacsclient -c -F '((name . "floating") (width . 150) (height
-    . 10))' -e '(ivy-read "hi" (list (quote a)))'=
+  + Invoke an emacs window with customized frame.
+
+  #+begin_src shell
+    emacsclient -c -F '((name . "floating") (width . 150) (height . 10))' -e '(ivy-read "hi" (list (quote a)))'
+  #+end_src
 
   + See [[https://babbagefiles.xyz/equake-elisp-console/][=equake=]].
 
