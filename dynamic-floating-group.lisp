@@ -52,7 +52,7 @@
 
 
 (defun sync-dyn-order (&optional (group (current-group)))
-  ;; Expect GROUP to be an instance of dyn-float-group
+  ;; TODO Expect GROUP to be an instance of dyn-float-group
 
   ;; If window W is not in the dyn-order, make one for it and
   ;; push into dyn-order.
@@ -66,7 +66,7 @@
   (loop for w+ in (dyn-float-group-dyn-order group)
         do (unless (member (win+-window w+) (group-windows group))
              (deletef (dyn-float-group-dyn-order group) w+)))
-  ;; Push free windows to the first elements in the list.
+  ;; Make the free windows on top of the stack.
   (setf (dyn-float-group-dyn-order group)
         (concatenate 'list
                      (remove-if (lambda (dyno) (equal nil (win+-free dyno)))
@@ -74,9 +74,10 @@
                      (remove-if (lambda (dyno) (equal t (win+-free dyno)))
                                 (dyn-float-group-dyn-order group))))
   ;; Let the (group-windows group) respect the order of
-  ;; (dyn-float-group-dyn-order group) FIXME Still need to know
-  ;; how to trigger stumpwm to reorder the displayed windows with
-  ;; respect to its window list.
+  ;; (dyn-float-group-dyn-order group)
+  ;;
+  ;; FIXME Still need to know how to trigger stumpwm to reorder
+  ;; the displayed windows with respect to its window list.
   (setf (group-windows group)
         (mapcar #'win+-window
                 (dyn-float-group-dyn-order group))))
@@ -114,19 +115,18 @@
 (defun unfree-window (&optional (window (current-window))
                         (group (current-group)))
   (loop for w+ in (dyn-float-group-dyn-order group)
-        if (equal window (win+-window w+))
-          do (setf (win+-free w+) nil))
+        do (when (equal window (win+-window w+))
+             (deletef (dyn-float-group-dyn-order group) w+)
+             (setf (win+-free w+) nil)
+             (push w+ (cdr (last (dyn-float-group-dyn-order group))))))
   (re-tile group))
 
 (defun toggle-freeness-current-window (&optional (window (current-window))
                                          (group (current-group)))
-  ;; TODO make the freed window more explicit.. maybe need to
-  ;; make the window smaller or something. also, when it goes
-  ;; back it should go to the bottom of the stack.
   (if (eq (win+-free (current-window+ group)) t)
-      (setf (win+-free (current-window+ group)) nil)
-      (setf (win+-free (current-window+ group)) t))
-  (re-tile))
+      (unfree-window window group)
+      (free-window window group))
+  (re-tile group))
 
 (defun unfloating-windows+ (&optional (group (current-group)))
   "Return the list of window+s whose :FREE slot is nil."
@@ -136,6 +136,8 @@
 
 (defun re-tile (&optional (group (current-group)))
   ;; FIXME respect modeline and boarder.. or even gap in the future
+  ;; Waiting for the fix for a related issue for general floating group.
+  ;; https://github.com/stumpwm/stumpwm/issues/864
   (sync-dyn-order group)
   (let* ((cs (slot-value (current-screen) 'number))
          (sw (xlib:screen-width cs))
