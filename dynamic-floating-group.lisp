@@ -1,11 +1,12 @@
 (load "~/stumpwm--dynamic-floating-group/util.lisp")
 (in-package #:stumpwm)
 
+;; An augmented window (a window with another piece of info.)
 (defstruct win+ :window :free)
-;; (win+-free (make-win+ :window 1 :free t))
+;;   access example: (win+-free (make-win+ :window 1 :free t))
 
+;; A dyn-order, or a dynamic order, is a list of win+.
 (defclass dyn-float-group (float-group)
-  ;; a dyn-order, or a dynamic order, is a list of win+.
   ((dyn-order :initform nil :accessor dyn-float-group-dyn-order)))
 
 (flet ((add-float-window (group window)
@@ -30,11 +31,25 @@
   (re-tile group))
 
 (defmethod group-button-press ((group dyn-float-group) button x y (window float-window))
-  (free-window window group)            ;; FIXME too early to do
-                                        ;; this. we want to free
-                                        ;; only when it is
-                                        ;; pressed with :super
+  ;; Free the window if it's pressed at the boarder or with
+  ;; *float-window-modifier*.
+  (let ((xwin (window-xwin window)))
+    (multiple-value-bind (relx rely same-screen-p child state-mask)
+        (xlib:query-pointer (window-parent window))
+      (declare (ignore same-screen-p child))
+      (when (or
+             (< x (xlib:drawable-x xwin))
+             (> x (+ (xlib:drawable-width xwin)
+                     (xlib:drawable-x xwin)))
+             (< y (xlib:drawable-y xwin))
+             (> y (+ (xlib:drawable-height xwin)
+                     (xlib:drawable-y xwin)))
+             (intersection (float-window-modifier)
+                           (xlib:make-state-keys state-mask)))
+        (free-window window group))))
+
   (call-next-method))
+
 
 (defun sync-dyn-order (&optional (group (current-group)))
   ;; Expect GROUP to be an instance of dyn-float-group
@@ -175,7 +190,7 @@
   (add-group (current-screen) name :type 'dyn-float-group :background t))
 
 ;; For testing.
-;; (setf test-group (gnew-dyn-float-bg "TEST"))
+(setf test-group (gnew-dyn-float-bg "TEST"))
 
 ;; for development ease
 (defcommand print-devel-stat () ()
