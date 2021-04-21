@@ -1,4 +1,4 @@
-(load "./util.lisp")
+(load "~/stumpwm--dynamic-floating-group/util.lisp")
 (in-package #:stumpwm)
 
 (defstruct dyn-order :window :free)
@@ -61,6 +61,8 @@
         (mapcar #'dyn-order-window
                 (dyn-float-group-dyn-order group))))
 
+;; TODO I should probably explain that window+ is a window and a
+;; its :free state.
 (defun current-window+ (&optional (group (current-group)))
   (let ((gcw (group-current-window group)))
     (find-if (lambda (x)
@@ -97,6 +99,12 @@
         if (equal window (dyn-order-window w+))
           do (setf (dyn-order-free w+) nil))
   (re-tile group))
+
+(defun toggle-freeness-current-window (&optional (window (current-window))
+                                 (group (current-group)))
+  (if (eq (dyn-order-free (current-window+ group)) t)
+      (setf (dyn-order-free (current-window+ group)) nil)
+      (setf (dyn-order-free (current-window+ group)) t)))
 
 (defun unfloating-windows+ (&optional (group (current-group)))
   "Return the list of window+s whose :FREE slot is nil."
