@@ -117,9 +117,12 @@
   (symbol-macrolet ((dyno (dyn-float-group-dyn-order group)))
     (loop for w+ in dyno
           do (when (equal window (win+-window w+))
-               (deletef dyno w+)
-               (setf (win+-free w+) nil)
-               (push w+ (cdr (last dyno))))))
+               (progn
+                 (deletef dyno w+)
+                 (setf (win+-free w+) nil)
+                 (if (null dyno)
+                     (setf dyno (list w+))
+                     (push w+ (cdr (last dyno))))))))
   (re-tile group))
 
 (defun toggle-freeness-current-window (&optional (window (current-window))
