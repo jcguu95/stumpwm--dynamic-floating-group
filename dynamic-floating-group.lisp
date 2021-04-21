@@ -31,6 +31,10 @@
   (sync-dyn-order group)
   (re-tile group))
 
+(defmethod group-button-press ((group dyn-float-group) button x y (window float-window))
+  (free-window window group)
+  (call-next-method))
+
 (defun sync-dyn-order (&optional (group (current-group)))
   ;; Expect GROUP to be an instance of dyn-float-group
 

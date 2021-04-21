@@ -3,7 +3,7 @@
 Usage: connect StumpWM to swank/slynk, and evaluate the file in
 the repl.
 
-** TODO
+** TODOs
 
 + (X) make every function default at group = (current-group).
   make every function check if input group is a dyn-float-group.
@@ -13,7 +13,7 @@ the repl.
   tile-group causes error. Also, moving a window from another
   group to a dyn-float-group causes an error.
 
-+ ( ) Free a window when it is controlled my mouse.
++ (X) Free a window when it is controlled my mouse.
 
 + ( ) Add a function to print the dyn-order (state) of the
   (current) group, in order to make the development easier.
