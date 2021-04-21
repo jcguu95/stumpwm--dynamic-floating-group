@@ -114,11 +114,12 @@
 
 (defun unfree-window (&optional (window (current-window))
                         (group (current-group)))
-  (loop for w+ in (dyn-float-group-dyn-order group)
-        do (when (equal window (win+-window w+))
-             (deletef (dyn-float-group-dyn-order group) w+)
-             (setf (win+-free w+) nil)
-             (push w+ (cdr (last (dyn-float-group-dyn-order group))))))
+  (symbol-macrolet ((dyno (dyn-float-group-dyn-order group)))
+    (loop for w+ in dyno
+          do (when (equal window (win+-window w+))
+               (deletef dyno w+)
+               (setf (win+-free w+) nil)
+               (push w+ (cdr (last dyno))))))
   (re-tile group))
 
 (defun toggle-freeness-current-window (&optional (window (current-window))
