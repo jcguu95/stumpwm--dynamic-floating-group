@@ -23,6 +23,11 @@ the repl.
 
 + [ ] Emacs drop-down window.
 
+  + =emacsclient -c -F '((name . "floating") (width . 150) (height
+    . 10))' -e '(ivy-read "hi" (list (quote a)))'=
+
+  + See [[https://babbagefiles.xyz/equake-elisp-console/][=equake=]].
+
 ** Related issues
 
 + While moving a floating window from a floating group =g1= to

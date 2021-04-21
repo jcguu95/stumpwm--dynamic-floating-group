@@ -181,14 +181,12 @@
 
 (defcommand gnew-dyn-float (name) ((:rest "Group Name: "))
   "Create a new dynamic floating group named NAME."
-  (unless name
-    (throw 'error :abort))
+  (unless name (throw 'error :abort))
   (add-group (current-screen) name :type 'dyn-float-group))
 
 (defcommand gnew-dyn-float-bg (name) ((:rest "Group Name: "))
   "Create a new dynamic floating group named NAME in the background."
-  (unless name
-    (throw 'error :abort))
+  (unless name (throw 'error :abort))
   (add-group (current-screen) name :type 'dyn-float-group :background t))
 
 ;; For testing.
