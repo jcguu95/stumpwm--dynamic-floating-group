@@ -21,7 +21,6 @@
      (dyn-float-group-dyn-order group)
      (list (make-dyn-order :window window
                            :free nil)))
-    (sync-dyn-order group)
     (re-tile group)))
 
 (defmethod group-delete-window ((group dyn-float-group)
