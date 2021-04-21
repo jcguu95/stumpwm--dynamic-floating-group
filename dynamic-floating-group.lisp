@@ -32,7 +32,10 @@
   (re-tile group))
 
 (defmethod group-button-press ((group dyn-float-group) button x y (window float-window))
-  (free-window window group)
+  (free-window window group)            ;; FIXME too early to do
+                                        ;; this. we want to free
+                                        ;; only when it is
+                                        ;; pressed with :super
   (call-next-method))
 
 (defun sync-dyn-order (&optional (group (current-group)))
@@ -106,6 +109,9 @@
 
 (defun toggle-freeness-current-window (&optional (window (current-window))
                                          (group (current-group)))
+  ;; TODO make it more explicit.. maybe need to make the window
+  ;; smaller or something. also, when it goes back ,ti should go
+  ;; from the bottoom.
   (if (eq (dyn-order-free (current-window+ group)) t)
       (setf (dyn-order-free (current-window+ group)) nil)
       (setf (dyn-order-free (current-window+ group)) t))
