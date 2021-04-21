@@ -22,7 +22,7 @@ and evaluate the file in the repl.
 
 + [X] Add a function to print the dyn-order (state) of the
       (current) group, in order to make the development easier.
-      
+
 + [ ] Add more commands and keybindings.
 
 + [ ] `#'re-tile` should respect modeline and boarder.. or even
@@ -33,7 +33,7 @@ and evaluate the file in the repl.
 + [ ] Emacs drop-down window.
 
   + See [`equake`](https://babbagefiles.xyz/equake-elisp-console/).
-  
+
   + Invoke an emacs window with customized frame.
 
   ```
