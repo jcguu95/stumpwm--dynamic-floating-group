@@ -75,9 +75,6 @@
                                 (dyn-float-group-dyn-order group))))
   ;; Let the (group-windows group) respect the order of
   ;; (dyn-float-group-dyn-order group)
-  ;;
-  ;; FIXME Still need to know how to trigger stumpwm to reorder
-  ;; the displayed windows with respect to its window list.
   (setf (group-windows group)
         (mapcar #'win+-window
                 (dyn-float-group-dyn-order group))))
