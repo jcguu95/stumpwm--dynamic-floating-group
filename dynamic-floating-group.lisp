@@ -164,19 +164,23 @@
           (permute-at dyno n)) ;; FIXME ugly workaround.
     (re-tile group)))
 
-(defun gnew-dyn-float (name)
-  ;; TODO Turn this into a stumpwm command.
+(defcommand gnew-dyn-float (name) ((:rest "Group Name: "))
+  "Create a new dynamic floating group named NAME."
+  (unless name
+    (throw 'error :abort))
   (add-group (current-screen) name :type 'dyn-float-group))
 
-(defun gnew-dyn-float-bg (name)
-  ;; TODO Turn this into a stumpwm command.
+(defcommand gnew-dyn-float-bg (name) ((:rest "Group Name: "))
+  "Create a new dynamic floating group named NAME in the background."
+  (unless name
+    (throw 'error :abort))
   (add-group (current-screen) name :type 'dyn-float-group :background t))
 
 ;; For testing.
 ;; (setf test-group (gnew-dyn-float-bg "TEST"))
 
 ;; for development ease
-(defcommand print-stat () ()
+(defcommand print-devel-stat () ()
   (echo (prin1-to-string
          (list (dyn-float-group-dyn-order (current-group))
                ""
