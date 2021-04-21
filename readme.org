@@ -5,17 +5,27 @@ the repl.
 
 ** TODOs
 
-+ (X) make every function default at group = (current-group).
-  make every function check if input group is a dyn-float-group.
++ [X] make every function default at group = (current-group). make every function check if input group is a dyn-float-group.
 
-+ ( ) Handle the case when windows are moving out and in to the
++ [?] Handle the case when windows are moving out and in to the
   group. Currently, moving a window from dyn-float-group to a
   tile-group causes error. Also, moving a window from another
   group to a dyn-float-group causes an error.
 
-+ (X) Free a window when it is controlled my mouse.
+  + This issue disappears at some point. There's still a little
+    bug however, which has been presented for the floating-group.
+    Namely, moving a window from a float group to another does
+    not stop the window being presented in the "from-group".
 
-+ (X) Add a function to print the dyn-order (state) of the
-  (current) group, in order to make the development easier.
++ [X] Free a window when it is controlled my mouse.
 
-+ ( ) Emacs drop-down window.
++ [X] Add a function to print the dyn-order (state) of the (current) group, in order to make the development easier.
+
++ [ ] Emacs drop-down window.
+
+** Related issues
+
++ While moving a floating window from a floating group =g1= to
+  another group =g2=, the window isn't removed immediately from =g1=
+  until the user switch focus to =g2=. This is a separate issue,
+  and has been reported [[https://github.com/stumpwm/stumpwm/issues/879][here]].
