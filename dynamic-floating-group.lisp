@@ -90,6 +90,23 @@
                    (equal gcw (win+-window x)))
                  (dyn-float-group-dyn-order group)))))
 
+(defun next-window+ (&optional (N 1) (group (current-group)))
+  (if (not (dyn-float-group-p group))
+      (error "GROUP must be of type DYN-FLOAT-GROUP.")
+      (let ((dyno (dyn-float-group-dyn-order group)))
+        (nth (mod (+ N (position (current-window+ group) dyno)) (length dyno))
+             dyno))))
+
+(defcommand focus-next-window (&optional (N 1) (group (current-group))) ()
+  (if (not (dyn-float-group-p group))
+      (error "GROUP must be of type DYN-FLOAT-GROUP.")
+      (group-focus-window group (win+-window (next-Nth-window+ N group)))))
+
+(defcommand focus-last-window (&optional (group (current-group))) ()
+  (if (not (dyn-float-group-p group))
+      (error "GROUP must be of type DYN-FLOAT-GROUP.")
+      (focus-next-window -1 group)))
+
 (defun current-window-position (&optional (group (current-group)))
   (if (not (dyn-float-group-p group))
       (error "GROUP must be of type DYN-FLOAT-GROUP.")
@@ -255,3 +272,28 @@ the (n+1)th element of RING."
          (list (dyn-float-group-dyn-order (current-group))
                ""
                (group-windows (current-group))))))
+
+;; (define-key *top-map* (stumpwm:kbd "s-j") "move-focus down")
+;; (define-key *top-map* (stumpwm:kbd "s-h") "move-focus left")
+;; (define-key *top-map* (stumpwm:kbd "s-k") "move-focus up")
+;; (define-key *top-map* (stumpwm:kbd "s-l") "move-focus right")
+;;
+;; (group-focus-window group (first (group-windows group)))
+
+(defcommand tmp-wrapper-s-j () ()
+  (let ((cg (current-group)))
+    (if (dyn-float-group-p cg)
+        (focus-next-window)
+        (call-interactively 'move-focus "down"))))
+(define-key *top-map* (stumpwm:kbd "s-j") "tmp-wrapper-s-j")
+
+(defcommand tmp-wrapper-s-k () ()
+  (let ((cg (current-group)))
+    (if (dyn-float-group-p cg)
+        (focus-last-window)
+        (call-interactively 'move-focus "up"))))
+(define-key *top-map* (stumpwm:kbd "s-k") "tmp-wrapper-s-k")
+
+;; TODO I think I should make another name space (CL package for
+;; the functions here.. many function names could easily collapse
+;; with others.
