@@ -221,6 +221,7 @@
             (re-tile group)))))
 
 (defcommand permute-window-list
+    ;; TODO Make 'opposite take + or - 1.
     (&optional opposite (group (current-group))
      (n (current-window-position group)))
     ()
@@ -277,7 +278,7 @@ the (n+1)th element of RING."
 ;; (define-key *top-map* (stumpwm:kbd "s-h") "move-focus left")
 ;; (define-key *top-map* (stumpwm:kbd "s-k") "move-focus up")
 ;; (define-key *top-map* (stumpwm:kbd "s-l") "move-focus right")
-;;
+;; "exchange-direction down" ;;
 ;; (group-focus-window group (first (group-windows group)))
 
 (defcommand tmp-wrapper-s-j () ()
@@ -294,6 +295,25 @@ the (n+1)th element of RING."
         (call-interactively 'move-focus "up"))))
 (define-key *top-map* (stumpwm:kbd "s-k") "tmp-wrapper-s-k")
 
+(defcommand tmp-wrapper-s-J () ()
+  (let ((cg (current-group)))
+    (if (dyn-float-group-p cg)
+        (permute-window-list)
+        (call-interactively 'exchange-direction "down"))))
+(define-key *top-map* (stumpwm:kbd "s-J") "tmp-wrapper-s-J")
+
+(defcommand tmp-wrapper-s-K () ()
+  (let ((cg (current-group)))
+    (if (dyn-float-group-p cg)
+        (permute-window-list t)
+        (call-interactively 'exchange-direction "up"))))
+(define-key *top-map* (stumpwm:kbd "s-K") "tmp-wrapper-s-K")
+
+;; TODO
+;; 1. s-H, s-L : (un)swap with master
+;; 2. s-h, s-l : (un)focus on master
+;; 3. s-+, s-- : toggle master width
+;;
 ;; TODO I think I should make another name space (CL package for
 ;; the functions here.. many function names could easily collapse
 ;; with others.
