@@ -295,19 +295,19 @@ the (n+1)th element of RING."
         (call-interactively 'move-focus "up"))))
 (define-key *top-map* (stumpwm:kbd "s-k") "tmp-wrapper-s-k")
 
-(defcommand tmp-wrapper-s-J () ()
+(defcommand tmp-wrapper-s-capitol-j () ()
   (let ((cg (current-group)))
     (if (dyn-float-group-p cg)
         (permute-window-list)
         (call-interactively 'exchange-direction "down"))))
-(define-key *top-map* (stumpwm:kbd "s-J") "tmp-wrapper-s-J")
+(define-key *top-map* (stumpwm:kbd "s-J") "tmp-wrapper-s-capitol-j")
 
-(defcommand tmp-wrapper-s-K () ()
+(defcommand tmp-wrapper-s-capitol-k () ()
   (let ((cg (current-group)))
     (if (dyn-float-group-p cg)
         (permute-window-list t)
         (call-interactively 'exchange-direction "up"))))
-(define-key *top-map* (stumpwm:kbd "s-K") "tmp-wrapper-s-K")
+(define-key *top-map* (stumpwm:kbd "s-K") "tmp-wrapper-s-capitol-k")
 
 ;; TODO
 ;; 1. s-H, s-L : (un)swap with master
