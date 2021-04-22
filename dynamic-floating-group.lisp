@@ -122,6 +122,7 @@
                    do (setf (win+-free w+) t))
              (re-tile group))))
 
+;; This will effectively force re-tile all windows in this group.
 (defcommand unfree-all
     (&optional (group (current-group))) ()
   (if (not (dyn-float-group-p group))
@@ -310,6 +311,7 @@ the (n+1)th element of RING."
 (define-key *top-map* (stumpwm:kbd "s-K") "tmp-wrapper-s-capitol-k")
 
 (define-key *top-map* (stumpwm:kbd "s-=") "unfree-all")
+;;
 ;; TODO Found a bug.. when some window is floating, permute might
 ;; not work. I should separate free windows and unfree windows
 ;; into two different lists. This is harder to fix cuz it will
