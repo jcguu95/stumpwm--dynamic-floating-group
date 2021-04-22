@@ -4,7 +4,13 @@ Dynamic tiling + floating support for StumpWM!
 
 ## Demo
 
-![GIF Demo](img/demo.gif)
++ Basic Movement
+
+  ![Basic Movement](img/basic-movement.gif)
+
++ Float and Retile
+
+  ![Float and Retile](img/float-and-retile.gif)
 
 ## Usage
 
