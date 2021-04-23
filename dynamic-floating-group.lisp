@@ -1,5 +1,7 @@
 (in-package #:stumpwm)
 
+(defparameter *master-ratio* (/ 2 3))
+
 ;; An augmented window (a window with another piece of info.)
 (defstruct win+ :window :free)
 ;;   access example: (win+-free (make-win+ :window 1 :free t))
@@ -198,28 +200,28 @@
             (t (progn
                  (float-window-move-resize
                   (car wl)
-                  :x 0 :y 0 :width (round (/ sw 2)) :height sh)
+                  :x 0 :y 0 :width (round (* sw *master-ratio*)) :height sh)
                  (loop for k from 1 to (- N 1)
                        do (float-window-move-resize
                            (nth k wl)
-                           :x (round (/ sw 2))
+                           :x (round (* sw *master-ratio*))
                            :y (* (round (/ sh (- N 1)))
                                  (- k 1))
-                           :width (round (/ sw 2))
+                           :width (round (* sw (- 1 *master-ratio*)))
                            :height (round (/ sh (- N 1))))))))))))
 
 (defcommand rotate-window-list
     (&optional (group (current-group)) opposite) ()
-    (if (not (dyn-float-group-p group))
-        (error "GROUP must be of type DYN-FLOAT-GROUP.")
-        (flet ((rotate-list (xs &optional opposite)
-                 "An adhoc pure function that rotates the list."
-                 (if opposite
-                     (concatenate 'list (cdr xs) (list (car xs)))
-                     (concatenate 'list (last xs) (butlast xs)))))
-          (symbol-macrolet ((dyno (dyn-float-group-dyn-order group)))
-            (setf dyno (rotate-list dyno opposite))
-            (re-tile group)))))
+  (if (not (dyn-float-group-p group))
+      (error "GROUP must be of type DYN-FLOAT-GROUP.")
+      (flet ((rotate-list (xs &optional opposite)
+               "An adhoc pure function that rotates the list."
+               (if opposite
+                   (concatenate 'list (cdr xs) (list (car xs)))
+                   (concatenate 'list (last xs) (butlast xs)))))
+        (symbol-macrolet ((dyno (dyn-float-group-dyn-order group)))
+          (setf dyno (rotate-list dyno opposite))
+          (re-tile group)))))
 
 (defcommand permute-window-list
     ;; TODO Make 'opposite take + or - 1.
