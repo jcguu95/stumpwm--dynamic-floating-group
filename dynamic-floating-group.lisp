@@ -1,6 +1,6 @@
 (in-package #:stumpwm)
 
-(defparameter *default-master-ratio* (/ 5 8))
+(defparameter *default-master-ratio* (/ 2 (+ 1 (sqrt 5))))
 (defparameter *master-ratio* *default-master-ratio*)
 
 ;; An augmented window (a window with another piece of info.)
@@ -193,6 +193,7 @@
                (sh (xlib:screen-height cs))
                (wl (mapcar #'win+-window (unfloating-windows+ group)))
                (N (length wl)))
+          (setf sh (- sh 18))           ;; FIXME An adhoc hack to respect modeline.
           (case N
             (0 nil)
             (1 (float-window-move-resize
