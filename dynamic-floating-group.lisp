@@ -3,6 +3,10 @@
 (defparameter *default-master-ratio* (/ 2 (+ 1 (sqrt 5))))
 (defparameter *master-ratio* *default-master-ratio*)
 
+(defparameter *default-layout* 'left-vertical)
+(defparameter *layout* 'left-vertical)
+(defparameter *layout* 'horizontal)
+
 ;; An augmented window (a window with another piece of info.)
 (defstruct win+ :window :free)
 ;;   access example: (win+-free (make-win+ :window 1 :free t))
@@ -193,24 +197,47 @@
                (sh (xlib:screen-height cs))
                (wl (mapcar #'win+-window (unfloating-windows+ group)))
                (N (length wl)))
-          (setf sh (- sh 18))           ;; FIXME An adhoc hack to respect modeline.
+
+          (setf sh (- sh 18)) ;; FIXME An adhoc hack to respect modeline.
+
           (case N
             (0 nil)
             (1 (float-window-move-resize
                 (car wl)
                 :x 0 :y 0 :width sw :height sh))
-            (t (progn
-                 (float-window-move-resize
-                  (car wl)
-                  :x 0 :y 0 :width (round (* sw *master-ratio*)) :height sh)
-                 (loop for k from 1 to (- N 1)
-                       do (float-window-move-resize
-                           (nth k wl)
-                           :x (round (* sw *master-ratio*))
-                           :y (* (round (/ sh (- N 1)))
-                                 (- k 1))
-                           :width (round (* sw (- 1 *master-ratio*)))
-                           :height (round (/ sh (- N 1))))))))))))
+            (t
+             (case *layout*
+               ('left-vertical
+                (progn
+                  (float-window-move-resize
+                   (car wl)
+                   :x 0 :y 0 :width (round (* sw *master-ratio*)) :height sh)
+                  (loop for k from 1 to (- N 1)
+                        do (float-window-move-resize
+                            (nth k wl)
+                            :x (round (* sw *master-ratio*))
+                            :y (* (round (/ sh (- N 1)))
+                                  (- k 1))
+                            :width (round (* sw (- 1 *master-ratio*)))
+                            :height (round (/ sh (- N 1)))))))
+               ('horizontal
+                (progn
+                  (float-window-move-resize
+                   (car wl)
+                   :x 0 :y 0 :width sw :height (round (* sh *master-ratio*)))
+                  (loop for k from 1 to (- N 1)
+                        do (float-window-move-resize
+                            (nth k wl)
+                            :x (* (round (/ sw (- N 1)))
+                                  (- k 1))
+                            :y (round (* sh *master-ratio*))
+                            :width (round (/ sw (- N 1)))
+                            :height (round (* sh (- 1 *master-ratio*)))
+                            )))
+                )
+               ;; ('right-vertical "TODO")
+               ;; ('fibonacci "TODO")
+               (otherwise (error "*LAYOUT* isn't supported.")))))))))
 
 (defcommand rotate-window-list
     (&optional (group (current-group)) opposite) ()
@@ -330,6 +357,13 @@ the (n+1)th element of RING."
 (define-key *top-map* (stumpwm:kbd "s--") "decrease-master-ratio")
 (define-key *top-map* (stumpwm:kbd "s-=") "default-master-ratio")
 
+;; (defcommand select-layout () ()) ;; TODO learn how to use stumpwm's menu
+(defcommand set-left-vertical-layout () ()
+  (setf *layout* 'left-vertical)
+  (re-tile))
+(defcommand set-horizontal-layout () ()
+  (setf *layout* 'horizontal)
+  (re-tile))
 
 ;;
 ;; TODO Found a bug.. when some window is floating, permute might
