@@ -100,7 +100,7 @@
 (defcommand focus-next-window (&optional (N 1) (group (current-group))) ()
   (if (not (dyn-float-group-p group))
       (error "GROUP must be of type DYN-FLOAT-GROUP.")
-      (group-focus-window group (win+-window (next-Nth-window+ N group)))))
+      (group-focus-window group (win+-window (next-window+ N group)))))
 
 (defcommand focus-last-window (&optional (group (current-group))) ()
   (if (not (dyn-float-group-p group))
@@ -266,7 +266,7 @@ the (n+1)th element of RING."
   (add-group (current-screen) name :type 'dyn-float-group :background t))
 
 ;; For testing.
-(setf test-group (gnew-dyn-float-bg "TEST"))
+;; (setf test-group (gnew-dyn-float-bg "TEST"))
 
 ;; for development ease
 (defcommand print-devel-stat () ()
@@ -325,3 +325,7 @@ the (n+1)th element of RING."
 ;; TODO I think I should make another name space (CL package for
 ;; the functions here.. many function names could easily collapse
 ;; with others.
+
+;; TODO Add a #'fullscreen for this group. When invoked, every
+;; thing should be full. When called again, everything should be
+;; tiled back to when it was.
