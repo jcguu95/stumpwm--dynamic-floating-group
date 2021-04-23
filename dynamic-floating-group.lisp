@@ -1,6 +1,7 @@
 (in-package #:stumpwm)
 
-(defparameter *master-ratio* (/ 2 3))
+(defparameter *default-master-ratio* (/ 5 8))
+(defparameter *master-ratio* *default-master-ratio*)
 
 ;; An augmented window (a window with another piece of info.)
 (defstruct win+ :window :free)
@@ -312,7 +313,23 @@ the (n+1)th element of RING."
         (call-interactively 'exchange-direction "up"))))
 (define-key *top-map* (stumpwm:kbd "s-K") "tmp-wrapper-s-capitol-k")
 
-(define-key *top-map* (stumpwm:kbd "s-=") "unfree-all")
+(define-key *top-map* (stumpwm:kbd "s-_") "unfree-all")
+
+
+(defcommand increase-master-ratio () ()
+  (setf *master-ratio* (* 1.05 *master-ratio*))
+  (re-tile))
+(defcommand decrease-master-ratio () ()
+  (setf *master-ratio* (* (/ 1 1.05) *master-ratio*))
+  (re-tile))
+(defcommand default-master-ratio () ()
+  (setf *master-ratio* *default-master-ratio*)
+  (re-tile))
+(define-key *top-map* (stumpwm:kbd "s-+") "increase-master-ratio")
+(define-key *top-map* (stumpwm:kbd "s--") "decrease-master-ratio")
+(define-key *top-map* (stumpwm:kbd "s-=") "default-master-ratio")
+
+
 ;;
 ;; TODO Found a bug.. when some window is floating, permute might
 ;; not work. I should separate free windows and unfree windows
