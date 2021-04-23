@@ -12,6 +12,10 @@ Dynamic tiling + floating support for StumpWM!
 
   ![Float and Retile](img/float-and-retile.gif)
 
++ Layout and Ratio
+
+  ![Layout and Ratio](img/layout-and-ratio.gif)
+
 ## Usage
 
 I will try to merge it to the main StumpWM repo after enough
