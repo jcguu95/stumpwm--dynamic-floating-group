@@ -367,22 +367,3 @@ the (n+1)th element of RING."
 (defcommand set-horizontal-layout () ()
   (setf *layout* 'horizontal)
   (re-tile))
-
-;;
-;; TODO Found a bug.. when some window is floating, permute might
-;; not work. I should separate free windows and unfree windows
-;; into two different lists. This is harder to fix cuz it will
-;; change the infrastructure a bit.
-
-;; TODO
-;; 1. s-H, s-L : (un)swap with master
-;; 2. s-h, s-l : (un)focus on master
-;; 3. s-+, s-- : toggle master width
-;;
-;; TODO I think I should make another name space (CL package for
-;; the functions here.. many function names could easily collapse
-;; with others.
-
-;; TODO Add a #'fullscreen for this group. When invoked, every
-;; thing should be full. When called again, everything should be
-;; tiled back to when it was.

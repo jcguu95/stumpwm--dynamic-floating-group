@@ -33,9 +33,9 @@ and evaluate the file in the repl.
 + [X] Add a function to print the dyn-order (state) of the
       (current) group, in order to make the development easier.
 
-+ [ ] Add more commands and keybindings.
++ [X] Add more commands and keybindings.
 
-+ [ ] `#'re-tile` should respect modeline and boarder.. or even
++ [X] `#'re-tile` should respect modeline and boarder.. or even
   gap in the future Waiting for the fix for a related issue for
   general floating group:
   https://github.com/stumpwm/stumpwm/issues/864
@@ -50,6 +50,24 @@ and evaluate the file in the repl.
   $ emacsclient -c -F '((name . "floating") (width . 150) (height . 10))' \
                 -e '(ivy-read "hi" (list (quote a)))'
   ```
+
++ [ ] Found a bug.. when some window is floating, permute might
+      not work. I should separate free windows and unfree windows
+      into two different lists. This is harder to fix cuz it will
+      change the infrastructure a bit.
+
++ [ ] Master swapping / focsing.
+ 
+      s-H, s-L : (un)swap with master
+      s-h, s-l : (un)focus on master
+
++ [ ] Add a #'fullscreen for this group. When invoked, every
+      thing should be full. When called again, everything should
+      be tiled back to when it was.
+
++ [ ] Another general issue is that the floating windows remain
+      as a floating-window instance while "thrown" to a
+      tiling-group. This should not happen. (?)
 
 ## Related issues
 
