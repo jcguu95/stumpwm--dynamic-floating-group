@@ -68,6 +68,8 @@ and evaluate the file in the repl.
 + [ ] Another general issue is that the floating windows remain
       as a floating-window instance while "thrown" to a
       tiling-group. This should not happen. (?)
+      
++ [ ] Make layout independent in each group.
 
 ## Related issues
 
