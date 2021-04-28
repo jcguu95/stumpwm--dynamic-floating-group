@@ -37,6 +37,9 @@
       force the freed windows to be the first elements in the
       list `dyn-order`. Fix this bug.
       
++ [ ] Add layouts `'right-vertical`, `'fibonacci`, .. etc.
+
+
 ## Related issues
 
 + While moving a floating window from a floating group `g1` to
