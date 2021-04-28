@@ -30,7 +30,7 @@ and evaluate the file in the repl.
 
 + [X] Free a window when it is controlled my mouse.
 
-+ [X] Add a function to print the dyn-order (state) of the
++ [X] Add a function to print the `dyn-order` (state) of the
       (current) group, in order to make the development easier.
 
 + [X] Add more commands and keybindings.
@@ -40,19 +40,11 @@ and evaluate the file in the repl.
   general floating group:
   https://github.com/stumpwm/stumpwm/issues/864
 
-+ [ ] When some window is free, permute might not work because I
-      force the freed windows to be the first elements in the
-      list `dyn-order`.
-
-+ [ ] Add a `#'fullscreen` for this group. When invoked, every
++ [X] Make layout independent in each group.
+      
++ [ ] Add `#'fullscreen` for this group. When invoked, every
       thing should be full. When called again, everything should
       be tiled back to when it was.
-
-+ [ ] Another general issue is that the floating windows remain
-      as a floating-window instance while "thrown" to a
-      tiling-group. This should not happen.
-      
-+ [X] Make layout independent in each group.
 
 ## Related issues
 
@@ -70,3 +62,8 @@ and evaluate the file in the repl.
  
       s-H, s-L : (un)swap with master
       s-h, s-l : (un)focus on master
+
++ [ ] When some window is free, permute (oppositely) does not
+      work for the first un-free window in `dyn-order` because I
+      force the freed windows to be the first elements in the
+      list `dyn-order`. Fix this bug.
