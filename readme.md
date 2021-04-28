@@ -56,12 +56,12 @@ and evaluate the file in the repl.
       into two different lists. This is harder to fix cuz it will
       change the infrastructure a bit.
 
-+ [ ] Master swapping / focsing.
++ [ ] Master swapping / focusing.
  
       s-H, s-L : (un)swap with master
       s-h, s-l : (un)focus on master
 
-+ [ ] Add a #'fullscreen for this group. When invoked, every
++ [ ] Add a `#'fullscreen` for this group. When invoked, every
       thing should be full. When called again, everything should
       be tiled back to when it was.
 
@@ -70,6 +70,10 @@ and evaluate the file in the repl.
       tiling-group. This should not happen. (?)
       
 + [ ] Make layout independent in each group.
+
++ [ ] Redirect focus correctly when a window is removed from the
+      group.
+     
 
 ## Related issues
 
