@@ -78,8 +78,16 @@
         ;; If window W+ does not correspond to a window of GROUP,
         ;; delete W+ from the dyn-order.
         (loop for w+ in (dyn-float-group-dyn-order group)
+              ;; TODO Use symbol-macrolet.
               do (unless (member (win+-window w+) (stumpwm::group-windows group))
-                   (alexandria:deletef (dyn-float-group-dyn-order group) w+)))
+                   (progn
+                     ;; TODO First remember the next w+.
+                     ;;
+                     ;; TODO Then switch focus to that w+, semantically.
+                     ;;
+                     ;; Then delete w+.
+                     (alexandria:deletef (dyn-float-group-dyn-order group) w+))))
+
         ;; Make the free windows on top of the stack.
         (setf (dyn-float-group-dyn-order group)
               (concatenate 'list
