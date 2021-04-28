@@ -67,16 +67,16 @@
 (defun sync-dyn-order (&optional (group (stumpwm:current-group)))
   (if (not (dyn-float-group-p group))
       (error "GROUP must be of type DYN-FLOAT-GROUP.")
-      ;; If window W is not in the dyn-order, make one for it and
-      ;; push into dyn-order.
+      ;; If window W does not have a corresponding W+ in the
+      ;; dyn-order, make one for it.
       (progn
         (loop for w in (stumpwm::group-windows group)
               do (unless (member w (mapcar #'win+-window
                                            (dyn-float-group-dyn-order group)))
                    (push (make-win+ :window w :free nil)
                          (dyn-float-group-dyn-order group))))
-        ;; If window W+ is not in the list of windows of GROUP, delete
-        ;; W+ from the dyn-order.
+        ;; If window W+ does not correspond to a window of GROUP,
+        ;; delete W+ from the dyn-order.
         (loop for w+ in (dyn-float-group-dyn-order group)
               do (unless (member (win+-window w+) (stumpwm::group-windows group))
                    (alexandria:deletef (dyn-float-group-dyn-order group) w+)))
