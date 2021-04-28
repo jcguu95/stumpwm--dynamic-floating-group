@@ -82,11 +82,13 @@
               do (unless (member (win+-window w+) (stumpwm::group-windows group))
                    (progn
                      ;; TODO First remember the next w+.
+                     ;;  Try using next-window+.
                      ;;
                      ;; TODO Then switch focus to that w+, semantically.
                      ;;
                      ;; Then delete w+.
-                     (alexandria:deletef (dyn-float-group-dyn-order group) w+))))
+                     ;; (alexandria:deletef (dyn-float-group-dyn-order group) w+)
+                     )))
 
         ;; Make the free windows on top of the stack.
         (setf (dyn-float-group-dyn-order group)
@@ -109,11 +111,13 @@
                    (equal gcw (win+-window x)))
                  (dyn-float-group-dyn-order group)))))
 
-(defun next-window+ (&optional (N 1) (group (stumpwm:current-group)))
+(defun next-window+ (&optional (N 1)
+                       (group (stumpwm:current-group))
+                       (window (current-window+ group)))
   (if (not (dyn-float-group-p group))
       (error "GROUP must be of type DYN-FLOAT-GROUP.")
       (let ((dyno (dyn-float-group-dyn-order group)))
-        (nth (mod (+ N (position (current-window+ group) dyno)) (length dyno))
+        (nth (mod (+ N (position window dyno)) (length dyno))
              dyno))))
 
 (defcommand focus-next-window (&optional (N 1) (group (stumpwm:current-group))) ()
