@@ -40,26 +40,9 @@ and evaluate the file in the repl.
   general floating group:
   https://github.com/stumpwm/stumpwm/issues/864
 
-+ [ ] Emacs drop-down window.
-
-  + See [`equake`](https://babbagefiles.xyz/equake-elisp-console/).
-
-  + Invoke an emacs window with customized frame.
-
-  ```
-  $ emacsclient -c -F '((name . "floating") (width . 150) (height . 10))' \
-                -e '(ivy-read "hi" (list (quote a)))'
-  ```
-
-+ [ ] Found a bug.. when some window is floating, permute might
-      not work. I should separate free windows and unfree windows
-      into two different lists. This is harder to fix cuz it will
-      change the infrastructure a bit.
-
-+ [ ] Master swapping / focusing.
- 
-      s-H, s-L : (un)swap with master
-      s-h, s-l : (un)focus on master
++ [ ] When some window is free, permute might not work because I
+      force the freed windows to be the first elements in the
+      list `dyn-order`.
 
 + [ ] Add a `#'fullscreen` for this group. When invoked, every
       thing should be full. When called again, everything should
@@ -67,12 +50,9 @@ and evaluate the file in the repl.
 
 + [ ] Another general issue is that the floating windows remain
       as a floating-window instance while "thrown" to a
-      tiling-group. This should not happen. (?)
+      tiling-group. This should not happen.
       
 + [X] Make layout independent in each group.
-
-+ [ ] Redirect focus correctly when a window is removed from the
-      group.
 
 ## Related issues
 
@@ -80,3 +60,13 @@ and evaluate the file in the repl.
   `g2`, the window isn't removed immediately from `g1` until the user switch
   focus to `g2`. This is a separate issue, and has been reported
   [here](https://github.com/stumpwm/stumpwm/issues/879).
+
+## Contributions
+
++ [ ] While a window is removed from the group, correctly switch
+      focus to the next window in `dyn-order`.
+
++ [ ] Master swapping / focusing.
+ 
+      s-H, s-L : (un)swap with master
+      s-h, s-l : (un)focus on master
