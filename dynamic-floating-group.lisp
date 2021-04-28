@@ -80,15 +80,7 @@
         (loop for w+ in (dyn-float-group-dyn-order group)
               ;; TODO Use symbol-macrolet.
               do (unless (member (win+-window w+) (stumpwm::group-windows group))
-                   (progn
-                     ;; TODO First remember the next w+.
-                     ;;  Try using next-window+.
-                     ;;
-                     ;; TODO Then switch focus to that w+, semantically.
-                     ;;
-                     ;; Then delete w+.
-                     ;; (alexandria:deletef (dyn-float-group-dyn-order group) w+)
-                     )))
+                   (alexandria:deletef (dyn-float-group-dyn-order group) w+)))
 
         ;; Make the free windows on top of the stack.
         (setf (dyn-float-group-dyn-order group)
