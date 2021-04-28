@@ -69,11 +69,10 @@ and evaluate the file in the repl.
       as a floating-window instance while "thrown" to a
       tiling-group. This should not happen. (?)
       
-+ [ ] Make layout independent in each group.
++ [X] Make layout independent in each group.
 
 + [ ] Redirect focus correctly when a window is removed from the
       group.
-     
 
 ## Related issues
 

@@ -6,9 +6,9 @@
 (defparameter *default-master-ratio* (/ 2 (+ 1 (sqrt 5))))
 (defparameter *master-ratio* *default-master-ratio*)
 
-(defparameter *default-layout* 'left-vertical)
-(defparameter *layout* 'left-vertical)
-(defparameter *layout* 'horizontal)
+(defparameter *default-layout* 'left-vertical) ;; 'horizontal is currently supported too
+;; (defparameter *layout* 'left-vertical)
+;; (defparameter *layout* 'horizontal)
 
 ;; An augmented window (a window with another piece of info.)
 (defstruct win+ :window :free)
@@ -16,7 +16,8 @@
 
 ;; A dyn-order, or a dynamic order, is a list of win+.
 (defclass dyn-float-group (stumpwm::float-group)
-  ((dyn-order :initform nil :accessor dyn-float-group-dyn-order)))
+  ((dyn-order :initform nil :accessor dyn-float-group-dyn-order)
+   (layout :initform *default-layout* :accessor dyn-float-group-layout)))
 
 (defun dyn-float-group-p (group)
   (eq (type-of group) 'dyn-float-group))
@@ -209,7 +210,7 @@
                 (car wl)
                 :x 0 :y 0 :width sw :height sh))
             (t
-             (case *layout*
+             (case (dyn-float-group-layout group)
                ('left-vertical
                 (progn
                   (stumpwm::float-window-move-resize
@@ -240,7 +241,7 @@
                 )
                ;; ('right-vertical "TODO")
                ;; ('fibonacci "TODO")
-               (otherwise (error "*LAYOUT* isn't supported.")))))))))
+               (otherwise (error "Layout isn't supported.")))))))))
 
 (defcommand rotate-window-list
     (&optional (group (stumpwm:current-group)) opposite) ()
@@ -362,8 +363,8 @@ the (n+1)th element of RING."
 
 ;; (defcommand select-layout () ()) ;; TODO learn how to use stumpwm's menu
 (defcommand set-left-vertical-layout () ()
-  (setf *layout* 'left-vertical)
+  (setf (dyn-float-group-layout (current-group)) 'left-vertical)
   (re-tile))
 (defcommand set-horizontal-layout () ()
-  (setf *layout* 'horizontal)
+  (setf (dyn-float-group-layout (current-group)) 'horizontal)
   (re-tile))
