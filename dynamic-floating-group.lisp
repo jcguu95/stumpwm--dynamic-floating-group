@@ -76,37 +76,34 @@ information will be used when the group re-tiles it."
 
   (call-next-method))
 
-
 (defun sync-dyn-order (&optional (group (stumpwm:current-group)))
   (if (not (dyn-float-group-p group))
       (error "GROUP must be of type DYN-FLOAT-GROUP.")
-      ;; If window W does not have a corresponding W+ in the
-      ;; dyn-order, make one for it.
-      (progn
+      (symbol-macrolet ((dyn-order (dyn-float-group-dyn-order group)))
+        ;; If window W does not have a corresponding W+ in the
+        ;; dyn-order, make one for it.
         (loop for w in (stumpwm::group-windows group)
-              do (unless (member w (mapcar #'win+-window
-                                           (dyn-float-group-dyn-order group)))
-                   (push (make-win+ :window w :free nil)
-                         (dyn-float-group-dyn-order group))))
+              do (unless (member w (mapcar #'win+-window dyn-order))
+                   (push (make-win+ :window w :free nil) dyn-order)))
         ;; If window W+ does not correspond to a window of GROUP,
         ;; delete W+ from the dyn-order.
-        (loop for w+ in (dyn-float-group-dyn-order group)
-              ;; TODO Use symbol-macrolet.
+        (loop for w+ in dyn-order
               do (unless (member (win+-window w+) (stumpwm::group-windows group))
-                   (alexandria:deletef (dyn-float-group-dyn-order group) w+)))
-
+                   (alexandria:deletef dyn-order w+)))
         ;; Make the free windows on top of the stack.
-        (setf (dyn-float-group-dyn-order group)
-              (concatenate 'list
-                           (remove-if (lambda (dyno) (equal nil (win+-free dyno)))
-                                      (dyn-float-group-dyn-order group))
-                           (remove-if (lambda (dyno) (equal t (win+-free dyno)))
-                                      (dyn-float-group-dyn-order group))))
+        (setf dyn-order
+              (concatenate
+               'list
+               (remove-if (lambda (dyno)
+                            (equal nil (win+-free dyno)))
+                          dyn-order)
+               (remove-if (lambda (dyno)
+                            (equal t (win+-free dyno)))
+                          dyn-order)))
         ;; Let the (group-windows group) respect the order of
-        ;; (dyn-float-group-dyn-order group)
+        ;; dyn-order
         (setf (stumpwm::group-windows group)
-              (mapcar #'win+-window
-                      (dyn-float-group-dyn-order group))))))
+              (mapcar #'win+-window dyn-order)))))
 
 (defun current-window+ (&optional (group (stumpwm:current-group)))
   (if (not (dyn-float-group-p group))
@@ -293,8 +290,7 @@ information will be used when the group re-tiles it."
 the (n+1)th element of RING."
                ;; ((0 1 2 3 4 5) 3) => (0 1 2 4 3 5)
                ;; ((0 1 2 3 4 5) 5) => (5 1 2 3 4 0)
-               (when (and (listp ring)
-                          (not (null ring)))
+               (when (and (listp ring) (not (null ring)))
                  (let* ((l (length ring))
                         (n (mod n l)))
                    (when (>= l 2)
@@ -308,7 +304,7 @@ the (n+1)th element of RING."
                                       (list (nth (mod (+ n 1) l) ring))
                                       (list (nth (mod (+ n 0) l) ring))
                                       (subseq ring (+ n 2)))))))))
-        (progn
+        (prog
           (when opposite (setf n (- n 1)))
           (symbol-macrolet ((dyno (dyn-float-group-dyn-order group)))
             (setf dyno (permute-at dyno n))
@@ -324,22 +320,12 @@ the (n+1)th element of RING."
   (unless name (throw 'error :abort))
   (add-group (stumpwm:current-screen) name :type 'dyn-float-group :background t))
 
-;; For testing.
-;; (setf test-group (gnew-dyn-float-bg "TEST"))
-
 ;; for development ease
 (defcommand print-devel-stat () ()
   (echo (prin1-to-string
          (list (dyn-float-group-dyn-order (stumpwm:current-group))
                ""
                (group-windows (stumpwm:current-group))))))
-
-;; (define-key *top-map* (stumpwm:kbd "s-j") "move-focus down")
-;; (define-key *top-map* (stumpwm:kbd "s-h") "move-focus left")
-;; (define-key *top-map* (stumpwm:kbd "s-k") "move-focus up")
-;; (define-key *top-map* (stumpwm:kbd "s-l") "move-focus right")
-;; "exchange-direction down" ;;
-;; (group-focus-window group (first (group-windows group)))
 
 (defcommand tmp-wrapper-s-j () ()
   (let ((cg (stumpwm:current-group)))
