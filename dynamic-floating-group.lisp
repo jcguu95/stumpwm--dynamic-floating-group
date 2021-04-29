@@ -4,13 +4,14 @@
 (in-package :stumpwm-dfg)
 
 (defparameter *default-master-ratio* (/ 2 (+ 1 (sqrt 5))))
-(defparameter *master-ratio* *default-master-ratio*)
-
 (defparameter *default-layout* 'left-vertical)
 
-;; An augmented window (a window with another piece of info.)
-(defstruct win+ :window :free)
-;;   access example: (win+-free (make-win+ :window 1 :free t))
+(defstruct win+
+  "An augmented window (win+) is a window with some other
+information. Usually, in a dynamic floating group, the
+information will be used when the group re-tiles it."
+  ;; access example: (win+-free (make-win+ :window 1 :free t))
+  :window :free)
 
 ;; A dyn-order, or a dynamic order, is a list of win+.
 (defclass dyn-float-group (stumpwm::float-group)
@@ -24,7 +25,12 @@
                 :accessor dyn-float-group-layout-hist
                 :documentation
                 "The list of layout histories. The first element
-                is interpreted as the current layout.")))
+                is interpreted as the current layout.")
+   (master-ratio :initform *default-master-ratio*
+                 :accessor dyn-float-group-master-ratio
+                 :documentation
+                 "The ratio that the master window will take
+                 apart.")))
 
 (defun dyn-float-group-p (group)
   (eq (type-of group) 'dyn-float-group))
@@ -211,7 +217,8 @@
                (sw (xlib:screen-width cs))
                (sh (xlib:screen-height cs))
                (wl (mapcar #'win+-window (unfloating-windows+ group)))
-               (N (length wl)))
+               (N (length wl))
+               (master-ratio (dyn-float-group-master-ratio group)))
 
           (setf sh (- sh 18)) ;; FIXME An adhoc hack to respect modeline.
 
@@ -226,28 +233,28 @@
                 (progn
                   (stumpwm::float-window-move-resize
                    (car wl)
-                   :x 0 :y 0 :width (round (* sw *master-ratio*)) :height sh)
+                   :x 0 :y 0 :width (round (* sw master-ratio)) :height sh)
                   (loop for k from 1 to (- N 1)
                         do (stumpwm::float-window-move-resize
                             (nth k wl)
-                            :x (round (* sw *master-ratio*))
+                            :x (round (* sw master-ratio))
                             :y (* (round (/ sh (- N 1)))
                                   (- k 1))
-                            :width (round (* sw (- 1 *master-ratio*)))
+                            :width (round (* sw (- 1 master-ratio)))
                             :height (round (/ sh (- N 1)))))))
                ('horizontal
                 (progn
                   (stumpwm::float-window-move-resize
                    (car wl)
-                   :x 0 :y 0 :width sw :height (round (* sh *master-ratio*)))
+                   :x 0 :y 0 :width sw :height (round (* sh master-ratio)))
                   (loop for k from 1 to (- N 1)
                         do (stumpwm::float-window-move-resize
                             (nth k wl)
                             :x (* (round (/ sw (- N 1)))
                                   (- k 1))
-                            :y (round (* sh *master-ratio*))
+                            :y (round (* sh master-ratio))
                             :width (round (/ sw (- N 1)))
-                            :height (round (* sh (- 1 *master-ratio*)))))))
+                            :height (round (* sh (- 1 master-ratio)))))))
                ('fullscreen
                 (loop for k from 0 to (- N 1)
                       do (stumpwm::float-window-move-resize
@@ -366,14 +373,17 @@ the (n+1)th element of RING."
 
 
 (defcommand increase-master-ratio () ()
-  (setf *master-ratio* (* 1.05 *master-ratio*))
-  (re-tile))
+  (symbol-macrolet ((master-ratio (dyn-float-group-master-ratio (current-group))))
+    (setf master-ratio (* 1.05 master-ratio))
+    (re-tile)))
 (defcommand decrease-master-ratio () ()
-  (setf *master-ratio* (* (/ 1 1.05) *master-ratio*))
-  (re-tile))
+  (symbol-macrolet ((master-ratio (dyn-float-group-master-ratio (current-group))))
+    (setf master-ratio (* (/ 1 1.05) master-ratio))
+    (re-tile)))
 (defcommand default-master-ratio () ()
-  (setf *master-ratio* *default-master-ratio*)
-  (re-tile))
+  (symbol-macrolet ((master-ratio (dyn-float-group-master-ratio (current-group))))
+    (setf master-ratio *default-master-ratio*)
+    (re-tile)))
 (define-key *top-map* (stumpwm:kbd "s-+") "increase-master-ratio")
 (define-key *top-map* (stumpwm:kbd "s--") "decrease-master-ratio")
 (define-key *top-map* (stumpwm:kbd "s-=") "default-master-ratio")
