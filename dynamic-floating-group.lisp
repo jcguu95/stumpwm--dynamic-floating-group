@@ -40,23 +40,26 @@ information will be used when the group re-tiles it."
          (change-class window 'stumpwm::float-window)
          (stumpwm::float-window-align window)
          (stumpwm::group-focus-window group window)))
-  (defmethod stumpwm:group-add-window ((group dyn-float-group)
-                                       window
-                                       &key &allow-other-keys)
+  (defmethod stumpwm:group-add-window
+      ((group dyn-float-group)
+       window
+       &key &allow-other-keys)
     (add-float-window group window)
-    (nconc
-     (dyn-float-group-dyn-order group)
-     (list (make-window+ :window window :free nil)))
+    (nconc (dyn-float-group-dyn-order group)
+           (list (make-window+ :window window :free nil)))
     (re-tile group)))
 
-(defmethod stumpwm:group-delete-window ((group dyn-float-group)
-                                        (window stumpwm::float-window))
+(defmethod stumpwm:group-delete-window
+    ((group dyn-float-group)
+     (window stumpwm::float-window))
   (declare (ignore window))
   (stumpwm::%float-focus-next group)
   (sync-dyn-order group)
   (re-tile group))
 
-(defmethod stumpwm:group-button-press ((group dyn-float-group) button x y (window stumpwm::float-window))
+(defmethod stumpwm:group-button-press
+    ((group dyn-float-group)
+     button x y (window stumpwm::float-window))
   ;; Free the window if it's pressed at the boarder or with
   ;; *float-window-modifier*.
   (let ((xwin (stumpwm:window-xwin window)))
@@ -73,7 +76,6 @@ information will be used when the group re-tiles it."
              (intersection (stumpwm::float-window-modifier)
                            (xlib:make-state-keys state-mask)))
         (free-window window group))))
-
   (call-next-method))
 
 (defun sync-dyn-order (&optional (group (stumpwm:current-group)))
@@ -149,7 +151,8 @@ information will be used when the group re-tiles it."
 
 ;; This will effectively force re-tile all windows in this group.
 (defcommand unfree-all
-    (&optional (group (stumpwm:current-group))) ()
+    (&optional (group (stumpwm:current-group)))
+    ()
   (if (not (dyn-float-group-p group))
       (error "GROUP must be of type DYN-FLOAT-GROUP.")
       (progn
@@ -158,7 +161,8 @@ information will be used when the group re-tiles it."
               do (setf (window+-free w+) nil))
         (re-tile group))))
 
-(defun free-window (&optional (window (stumpwm:current-window))
+(defun free-window (&optional
+                      (window (stumpwm:current-window))
                       (group (stumpwm:current-group)))
   (if (not (dyn-float-group-p group))
       (error "GROUP must be of type DYN-FLOAT-GROUP.")
@@ -169,7 +173,10 @@ information will be used when the group re-tiles it."
         (re-tile group))))
 
 (defcommand unfree-window
-    (&optional (window (stumpwm:current-window)) (group (stumpwm:current-group))) ()
+    (&optional
+     (window (stumpwm:current-window))
+     (group (stumpwm:current-group)))
+    ()
   (if (not (dyn-float-group-p group))
       (error "GROUP must be of type DYN-FLOAT-GROUP.")
       (progn
@@ -184,8 +191,10 @@ information will be used when the group re-tiles it."
                            (push w+ (cdr (last dyno))))))))
         (re-tile group))))
 
-(defun toggle-freeness-current-window (&optional (window (stumpwm:current-window))
-                                         (group (stumpwm:current-group)))
+(defun toggle-freeness-current-window
+    (&optional
+       (window (stumpwm:current-window))
+       (group (stumpwm:current-group)))
   (if (not (dyn-float-group-p group))
       (error "GROUP must be of type DYN-FLOAT-GROUP.")
       (progn
@@ -261,7 +270,10 @@ information will be used when the group re-tiles it."
                (otherwise (error "Layout isn't supported.")))))))))
 
 (defcommand rotate-window-list
-    (&optional (group (stumpwm:current-group)) opposite) ()
+    (&optional
+     (group (stumpwm:current-group))
+     opposite)
+    ()
   (if (not (dyn-float-group-p group))
       (error "GROUP must be of type DYN-FLOAT-GROUP.")
       (flet ((rotate-list (xs &optional opposite)
@@ -274,11 +286,11 @@ information will be used when the group re-tiles it."
           (re-tile group)))))
 
 (defcommand permute-window-list
-    ;; TODO Make 'opposite take + or - 1.
-    (&optional opposite (group (stumpwm:current-group))
+    (&optional
+     opposite
+     (group (stumpwm:current-group))
      (n (current-window-position group)))
     ()
-
   (if (not (dyn-float-group-p group))
       (error "GROUP must be of type DYN-FLOAT-GROUP.")
       (flet ((permute-at (ring n)
