@@ -6,14 +6,14 @@
 (defparameter *default-master-ratio* (/ 2 (+ 1 (sqrt 5))))
 (defparameter *default-layout* 'left-vertical)
 
-(defstruct win+
-  "An augmented window (win+) is a window with some other
+(defstruct window+
+  "An augmented window (window+) is a window with some other
 information. Usually, in a dynamic floating group, the
 information will be used when the group re-tiles it."
-  ;; access example: (win+-free (make-win+ :window 1 :free t))
+  ;; access example: (window+-free (make-window+ :window 1 :free t))
   :window :free)
 
-;; A dyn-order, or a dynamic order, is a list of win+.
+;; A dyn-order, or a dynamic order, is a list of window+.
 (defclass dyn-float-group (stumpwm::float-group)
   ((dyn-order :initform nil
               :accessor dyn-float-group-dyn-order
@@ -46,7 +46,7 @@ information will be used when the group re-tiles it."
     (add-float-window group window)
     (nconc
      (dyn-float-group-dyn-order group)
-     (list (make-win+ :window window :free nil)))
+     (list (make-window+ :window window :free nil)))
     (re-tile group)))
 
 (defmethod stumpwm:group-delete-window ((group dyn-float-group)
@@ -83,34 +83,34 @@ information will be used when the group re-tiles it."
         ;; If window W does not have a corresponding W+ in the
         ;; dyn-order, make one for it.
         (loop for w in (stumpwm::group-windows group)
-              do (unless (member w (mapcar #'win+-window dyn-order))
-                   (push (make-win+ :window w :free nil) dyn-order)))
+              do (unless (member w (mapcar #'window+-window dyn-order))
+                   (push (make-window+ :window w :free nil) dyn-order)))
         ;; If window W+ does not correspond to a window of GROUP,
         ;; delete W+ from the dyn-order.
         (loop for w+ in dyn-order
-              do (unless (member (win+-window w+) (stumpwm::group-windows group))
+              do (unless (member (window+-window w+) (stumpwm::group-windows group))
                    (alexandria:deletef dyn-order w+)))
         ;; Make the free windows on top of the stack.
         (setf dyn-order
               (concatenate
                'list
                (remove-if (lambda (dyno)
-                            (equal nil (win+-free dyno)))
+                            (equal nil (window+-free dyno)))
                           dyn-order)
                (remove-if (lambda (dyno)
-                            (equal t (win+-free dyno)))
+                            (equal t (window+-free dyno)))
                           dyn-order)))
         ;; Let the (group-windows group) respect the order of
         ;; dyn-order
         (setf (stumpwm::group-windows group)
-              (mapcar #'win+-window dyn-order)))))
+              (mapcar #'window+-window dyn-order)))))
 
 (defun current-window+ (&optional (group (stumpwm:current-group)))
   (if (not (dyn-float-group-p group))
       (error "GROUP must be of type DYN-FLOAT-GROUP.")
       (let ((gcw (stumpwm::group-current-window group)))
         (find-if (lambda (x)
-                   (equal gcw (win+-window x)))
+                   (equal gcw (window+-window x)))
                  (dyn-float-group-dyn-order group)))))
 
 (defun next-window+ (&optional (N 1)
@@ -125,7 +125,7 @@ information will be used when the group re-tiles it."
 (defcommand focus-next-window (&optional (N 1) (group (stumpwm:current-group))) ()
   (if (not (dyn-float-group-p group))
       (error "GROUP must be of type DYN-FLOAT-GROUP.")
-      (stumpwm::group-focus-window group (win+-window (next-window+ N group)))))
+      (stumpwm::group-focus-window group (window+-window (next-window+ N group)))))
 
 (defcommand focus-last-window (&optional (group (stumpwm:current-group))) ()
   (if (not (dyn-float-group-p group))
@@ -144,7 +144,7 @@ information will be used when the group re-tiles it."
       (error "GROUP must be of type DYN-FLOAT-GROUP.")
       ;; alias: un-tile-all
       (progn (loop for w+ in (dyn-float-group-dyn-order group)
-                   do (setf (win+-free w+) t))
+                   do (setf (window+-free w+) t))
              (re-tile group))))
 
 ;; This will effectively force re-tile all windows in this group.
@@ -155,7 +155,7 @@ information will be used when the group re-tiles it."
       (progn
         ;; alias: tile-all
         (loop for w+ in (dyn-float-group-dyn-order group)
-              do (setf (win+-free w+) nil))
+              do (setf (window+-free w+) nil))
         (re-tile group))))
 
 (defun free-window (&optional (window (stumpwm:current-window))
@@ -164,8 +164,8 @@ information will be used when the group re-tiles it."
       (error "GROUP must be of type DYN-FLOAT-GROUP.")
       (progn
         (loop for w+ in (dyn-float-group-dyn-order group)
-              if (equal window (win+-window w+))
-                do (setf (win+-free w+) t))
+              if (equal window (window+-window w+))
+                do (setf (window+-free w+) t))
         (re-tile group))))
 
 (defcommand unfree-window
@@ -175,10 +175,10 @@ information will be used when the group re-tiles it."
       (progn
         (symbol-macrolet ((dyno (dyn-float-group-dyn-order group)))
           (loop for w+ in dyno
-                do (when (equal window (win+-window w+))
+                do (when (equal window (window+-window w+))
                      (progn
                        (alexandria:deletef dyno w+)
-                       (setf (win+-free w+) nil)
+                       (setf (window+-free w+) nil)
                        (if (null dyno)
                            (setf dyno (list w+))
                            (push w+ (cdr (last dyno))))))))
@@ -189,7 +189,7 @@ information will be used when the group re-tiles it."
   (if (not (dyn-float-group-p group))
       (error "GROUP must be of type DYN-FLOAT-GROUP.")
       (progn
-        (if (eq (win+-free (current-window+ group)) t)
+        (if (eq (window+-free (current-window+ group)) t)
             (unfree-window window group)
             (free-window window group))
         (re-tile group))))
@@ -199,7 +199,7 @@ information will be used when the group re-tiles it."
   (if (not (dyn-float-group-p group))
       (error "GROUP must be of type DYN-FLOAT-GROUP.")
       (remove-if-not
-       (lambda (w+) (eq (win+-free w+) nil))
+       (lambda (w+) (eq (window+-free w+) nil))
        (dyn-float-group-dyn-order group))))
 
 (defun re-tile (&optional (group (stumpwm:current-group)))
@@ -213,7 +213,7 @@ information will be used when the group re-tiles it."
         (let* ((cs (slot-value (stumpwm:current-screen) 'number))
                (sw (xlib:screen-width cs))
                (sh (xlib:screen-height cs))
-               (wl (mapcar #'win+-window (unfloating-windows+ group)))
+               (wl (mapcar #'window+-window (unfloating-windows+ group)))
                (N (length wl))
                (master-ratio (dyn-float-group-master-ratio group)))
 
@@ -306,10 +306,6 @@ the (n+1)th element of RING."
                 ((dyno (dyn-float-group-dyn-order group)))
               (setf dyno (permute-at dyno n)))
              (re-tile group)))))
-
-(defparameter *x* '(1 2 3))
-(symbol-macrolet ((x (car *x*)))
-  (setf x (* x x)))
 
 (defcommand gnew-dyn-float (name) ((:rest "Group Name: "))
   "Create a new dynamic floating group named NAME."
