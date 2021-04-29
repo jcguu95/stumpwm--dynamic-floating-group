@@ -217,7 +217,8 @@ information will be used when the group re-tiles it."
                (N (length wl))
                (master-ratio (dyn-float-group-master-ratio group)))
 
-          (setf sh (- sh 18)) ;; FIXME An adhoc hack to respect modeline.
+          (setf sw (- sw 2))  ; FIXME Adhoc hack to respect boarder width.
+          (setf sh (- sh 18)) ; FIXME An adhoc hack to respect modeline.
 
           (case N
             (0 nil)
@@ -235,8 +236,7 @@ information will be used when the group re-tiles it."
                         do (stumpwm::float-window-move-resize
                             (nth k wl)
                             :x (round (* sw master-ratio))
-                            :y (* (round (/ sh (- N 1)))
-                                  (- k 1))
+                            :y (* (round (/ sh (- N 1))) (- k 1))
                             :width (round (* sw (- 1 master-ratio)))
                             :height (round (/ sh (- N 1)))))))
                ('horizontal
@@ -247,8 +247,7 @@ information will be used when the group re-tiles it."
                   (loop for k from 1 to (- N 1)
                         do (stumpwm::float-window-move-resize
                             (nth k wl)
-                            :x (* (round (/ sw (- N 1)))
-                                  (- k 1))
+                            :x (* (round (/ sw (- N 1))) (- k 1))
                             :y (round (* sh master-ratio))
                             :width (round (/ sw (- N 1)))
                             :height (round (* sh (- 1 master-ratio)))))))
@@ -256,10 +255,7 @@ information will be used when the group re-tiles it."
                 (loop for k from 0 to (- N 1)
                       do (stumpwm::float-window-move-resize
                           (nth k wl)
-                          :x 0
-                          :y 0
-                          :width sw
-                          :height sh)))
+                          :x 0 :y 0 :width sw :height sh)))
                ;; ('right-vertical "TODO")
                ;; ('fibonacci "TODO")
                (otherwise (error "Layout isn't supported.")))))))))
@@ -304,11 +300,16 @@ the (n+1)th element of RING."
                                       (list (nth (mod (+ n 1) l) ring))
                                       (list (nth (mod (+ n 0) l) ring))
                                       (subseq ring (+ n 2)))))))))
-        (prog
-          (when opposite (setf n (- n 1)))
-          (symbol-macrolet ((dyno (dyn-float-group-dyn-order group)))
-            (setf dyno (permute-at dyno n))
-            (re-tile group))))))
+        (progn
+            (when opposite (setf n (- n 1)))
+            (symbol-macrolet
+                ((dyno (dyn-float-group-dyn-order group)))
+              (setf dyno (permute-at dyno n)))
+             (re-tile group)))))
+
+(defparameter *x* '(1 2 3))
+(symbol-macrolet ((x (car *x*)))
+  (setf x (* x x)))
 
 (defcommand gnew-dyn-float (name) ((:rest "Group Name: "))
   "Create a new dynamic floating group named NAME."
