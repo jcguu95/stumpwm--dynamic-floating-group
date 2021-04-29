@@ -121,13 +121,15 @@ information will be used when the group re-tiles it."
   (if (not (dyn-float-group-p group))
       (error "GROUP must be of type DYN-FLOAT-GROUP.")
       (let ((dyno (dyn-float-group-dyn-order group)))
-        (nth (mod (+ N (position window dyno)) (length dyno))
+        (nth (mod (+ N (position window dyno))
+                  (length dyno))
              dyno))))
 
 (defcommand focus-next-window (&optional (N 1) (group (stumpwm:current-group))) ()
   (if (not (dyn-float-group-p group))
       (error "GROUP must be of type DYN-FLOAT-GROUP.")
-      (stumpwm::group-focus-window group (window+-window (next-window+ N group)))))
+      (stumpwm::group-focus-window group
+                                   (window+-window (next-window+ N group)))))
 
 (defcommand focus-last-window (&optional (group (stumpwm:current-group))) ()
   (if (not (dyn-float-group-p group))
@@ -208,13 +210,11 @@ information will be used when the group re-tiles it."
   (if (not (dyn-float-group-p group))
       (error "GROUP must be of type DYN-FLOAT-GROUP.")
       (remove-if-not
-       (lambda (w+) (eq (window+-free w+) nil))
+       (lambda (w+)
+         (eq (window+-free w+) nil))
        (dyn-float-group-dyn-order group))))
 
 (defun re-tile (&optional (group (stumpwm:current-group)))
-  ;; FIXME respect modeline and boarder.. or even gap in the future
-  ;; Waiting for the fix for a related issue for general floating group.
-  ;; https://github.com/stumpwm/stumpwm/issues/864
   (if (not (dyn-float-group-p group))
       (error "GROUP must be of type DYN-FLOAT-GROUP.")
       (progn
@@ -224,18 +224,21 @@ information will be used when the group re-tiles it."
                (sh (xlib:screen-height cs))
                (wl (mapcar #'window+-window (unfloating-windows+ group)))
                (N (length wl))
-               (master-ratio (dyn-float-group-master-ratio group)))
 
-          (setf sw (- sw 2))  ; FIXME Adhoc hack to respect boarder width.
-          (setf sh (- sh 18)) ; FIXME An adhoc hack to respect modeline.
+               (master-ratio (dyn-float-group-master-ratio group))
+               (current-layout (car (dyn-float-group-layout-hist group))))
+
+          ;; Waiting for the fix for a related issue for general floating group.
+          ;; https://github.com/stumpwm/stumpwm/issues/864
+          (setf sw (- sw 2))  ; Adhoc hack to respect boarder width FIXME.
+          (setf sh (- sh 18)) ; Adhoc hack to respect modeline FIXME.
 
           (case N
             (0 nil)
             (1 (stumpwm::float-window-move-resize
                 (car wl)
                 :x 0 :y 0 :width sw :height sh))
-            (t
-             (case (car (dyn-float-group-layout-hist group))
+            (t (case current-layout
                ('left-vertical
                 (progn
                   (stumpwm::float-window-move-resize
@@ -319,18 +322,23 @@ the (n+1)th element of RING."
               (setf dyno (permute-at dyno n)))
              (re-tile group)))))
 
-(defcommand gnew-dyn-float (name) ((:rest "Group Name: "))
+(defcommand gnew-dyn-float
+    (name) ((:rest "Group Name: "))
   "Create a new dynamic floating group named NAME."
   (unless name (throw 'error :abort))
-  (add-group (stumpwm:current-screen) name :type 'dyn-float-group))
+  (add-group (stumpwm:current-screen) name
+             :type 'dyn-float-group))
 
-(defcommand gnew-dyn-float-bg (name) ((:rest "Group Name: "))
+(defcommand gnew-dyn-float-bg
+    (name) ((:rest "Group Name: "))
   "Create a new dynamic floating group named NAME in the background."
   (unless name (throw 'error :abort))
-  (add-group (stumpwm:current-screen) name :type 'dyn-float-group :background t))
+  (add-group (stumpwm:current-screen) name
+             :type 'dyn-float-group
+             :background t))
 
-;; for development ease
 (defcommand print-devel-stat () ()
+  "A command that helps development. Should not be exported."
   (echo (prin1-to-string
          (list (dyn-float-group-dyn-order (stumpwm:current-group))
                ""
@@ -383,7 +391,8 @@ the (n+1)th element of RING."
 (define-key *top-map* (stumpwm:kbd "s--") "decrease-master-ratio")
 (define-key *top-map* (stumpwm:kbd "s-=") "default-master-ratio")
 
-;; (defcommand select-layout () ()) ;; TODO learn how to use stumpwm's menu
+;; TODO Learn how to use stumpwm's menu and implement this.
+;; (defcommand select-layout () ())
 
 (defcommand toggle-left-vertical-layout () ()
   (symbol-macrolet ((layout-hist (dyn-float-group-layout-hist (current-group))))
