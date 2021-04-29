@@ -22,6 +22,11 @@ I will try to merge it to the main StumpWM repo after enough
 testing. In the meanwhile, connect StumpWM to `swank` or `slynk`,
 and evaluate the file in the repl.
 
+It's currently waiting to be
+[merged](https://github.com/stumpwm/stumpwm/pull/885). Please join discussion
+there.
+
+
 ## Documentation
 
 This file `DYN-FLOAT-GROUP` aims to provide a dynamic tiling
@@ -36,7 +41,7 @@ order (or `dyn-order`).
 
 The function `#'sync-dyn-order` syncs `dyn-order` with the list
 of (ordinary) windows, which is accessible for example by
-`(group-windows (current-group))`. 
+`(group-windows (current-group))`.
 
 Since each window in a `dyn-float-group` is a `float-window`,
 most methods for floating windows work. Most notably, the user
@@ -56,5 +61,5 @@ are
 
   + `fullscreen`
   + .. (more to come?)
-  
+
 (Note that this is undone yet.)
