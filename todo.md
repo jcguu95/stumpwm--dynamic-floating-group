@@ -18,9 +18,9 @@
 
 + [X] Make layout independent in each group.
       
-+ [ ] Add `#'fullscreen` for this group. When invoked, every
-      thing should be full. When called again, everything should
-      be tiled back to when it was.
++ [X] Add `#'toggle-fullscreen-layout` for this group. When
+      invoked, every thing should be full. When called again,
+      everything should be tiled back to when it was.
 
 ## Contributions
 
@@ -39,6 +39,8 @@
       
 + [ ] Add layouts `'right-vertical`, `'fibonacci`, .. etc.
 
++ [ ] Ban `#'fullscreen` and other functions (to find out) that
+      will cause undesired result in a dynamic floating group.
 
 ## Related issues
 

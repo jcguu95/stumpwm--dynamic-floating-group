@@ -6,9 +6,7 @@
 (defparameter *default-master-ratio* (/ 2 (+ 1 (sqrt 5))))
 (defparameter *master-ratio* *default-master-ratio*)
 
-(defparameter *default-layout* 'left-vertical) ;; 'horizontal is currently supported too
-;; (defparameter *layout* 'left-vertical)
-;; (defparameter *layout* 'horizontal)
+(defparameter *default-layout* 'left-vertical)
 
 ;; An augmented window (a window with another piece of info.)
 (defstruct win+ :window :free)
@@ -16,8 +14,17 @@
 
 ;; A dyn-order, or a dynamic order, is a list of win+.
 (defclass dyn-float-group (stumpwm::float-group)
-  ((dyn-order :initform nil :accessor dyn-float-group-dyn-order)
-   (layout :initform *default-layout* :accessor dyn-float-group-layout)))
+  ((dyn-order :initform nil
+              :accessor dyn-float-group-dyn-order
+              :documentation
+              "The list of augmented windows (window+) that the
+              group holds. A dyn-float-group should tile
+              automatically according to it.")
+   (layout-hist :initform (list *default-layout*)
+                :accessor dyn-float-group-layout-hist
+                :documentation
+                "The list of layout histories. The first element
+                is interpreted as the current layout.")))
 
 (defun dyn-float-group-p (group)
   (eq (type-of group) 'dyn-float-group))
@@ -28,8 +35,8 @@
          (stumpwm::float-window-align window)
          (stumpwm::group-focus-window group window)))
   (defmethod stumpwm:group-add-window ((group dyn-float-group)
-                               window
-                               &key &allow-other-keys)
+                                       window
+                                       &key &allow-other-keys)
     (add-float-window group window)
     (nconc
      (dyn-float-group-dyn-order group)
@@ -37,7 +44,7 @@
     (re-tile group)))
 
 (defmethod stumpwm:group-delete-window ((group dyn-float-group)
-                                (window stumpwm::float-window))
+                                        (window stumpwm::float-window))
   (declare (ignore window))
   (stumpwm::%float-focus-next group)
   (sync-dyn-order group)
@@ -160,19 +167,19 @@
 
 (defcommand unfree-window
     (&optional (window (stumpwm:current-window)) (group (stumpwm:current-group))) ()
-    (if (not (dyn-float-group-p group))
-        (error "GROUP must be of type DYN-FLOAT-GROUP.")
-        (progn
-          (symbol-macrolet ((dyno (dyn-float-group-dyn-order group)))
-            (loop for w+ in dyno
-                  do (when (equal window (win+-window w+))
-                       (progn
-                         (alexandria:deletef dyno w+)
-                         (setf (win+-free w+) nil)
-                         (if (null dyno)
-                             (setf dyno (list w+))
-                             (push w+ (cdr (last dyno))))))))
-          (re-tile group))))
+  (if (not (dyn-float-group-p group))
+      (error "GROUP must be of type DYN-FLOAT-GROUP.")
+      (progn
+        (symbol-macrolet ((dyno (dyn-float-group-dyn-order group)))
+          (loop for w+ in dyno
+                do (when (equal window (win+-window w+))
+                     (progn
+                       (alexandria:deletef dyno w+)
+                       (setf (win+-free w+) nil)
+                       (if (null dyno)
+                           (setf dyno (list w+))
+                           (push w+ (cdr (last dyno))))))))
+        (re-tile group))))
 
 (defun toggle-freeness-current-window (&optional (window (stumpwm:current-window))
                                          (group (stumpwm:current-group)))
@@ -214,7 +221,7 @@
                 (car wl)
                 :x 0 :y 0 :width sw :height sh))
             (t
-             (case (dyn-float-group-layout group)
+             (case (car (dyn-float-group-layout-hist group))
                ('left-vertical
                 (progn
                   (stumpwm::float-window-move-resize
@@ -240,9 +247,15 @@
                                   (- k 1))
                             :y (round (* sh *master-ratio*))
                             :width (round (/ sw (- N 1)))
-                            :height (round (* sh (- 1 *master-ratio*)))
-                            )))
-                )
+                            :height (round (* sh (- 1 *master-ratio*)))))))
+               ('fullscreen
+                (loop for k from 0 to (- N 1)
+                      do (stumpwm::float-window-move-resize
+                          (nth k wl)
+                          :x 0
+                          :y 0
+                          :width sw
+                          :height sh)))
                ;; ('right-vertical "TODO")
                ;; ('fibonacci "TODO")
                (otherwise (error "Layout isn't supported.")))))))))
@@ -366,9 +379,26 @@ the (n+1)th element of RING."
 (define-key *top-map* (stumpwm:kbd "s-=") "default-master-ratio")
 
 ;; (defcommand select-layout () ()) ;; TODO learn how to use stumpwm's menu
-(defcommand set-left-vertical-layout () ()
-  (setf (dyn-float-group-layout (current-group)) 'left-vertical)
-  (re-tile))
-(defcommand set-horizontal-layout () ()
-  (setf (dyn-float-group-layout (current-group)) 'horizontal)
-  (re-tile))
+
+(defcommand toggle-left-vertical-layout () ()
+  (symbol-macrolet ((layout-hist (dyn-float-group-layout-hist (current-group))))
+    (if (eq (car layout-hist) 'left-vertical)
+        (push (nth 1 layout-hist) layout-hist)
+        (push 'left-vertical layout-hist))
+    (re-tile)))
+
+(defcommand toggle-horizontal-layout () ()
+  (symbol-macrolet ((layout-hist (dyn-float-group-layout-hist (current-group))))
+    (if (eq (car layout-hist) 'horizontal)
+        (push (nth 1 layout-hist) layout-hist)
+        (push 'horizontal layout-hist))
+    (re-tile)))
+
+(defcommand toggle-fullscreen-layout () ()
+  (symbol-macrolet ((layout-hist (dyn-float-group-layout-hist (current-group))))
+    (if (eq (car layout-hist) 'fullscreen)
+        (push (nth 1 layout-hist) layout-hist)
+        (push 'fullscreen layout-hist))
+    (re-tile)))
+
+(define-key *top-map* (stumpwm:kbd "s-f") "toggle-fullscreen-layout")
