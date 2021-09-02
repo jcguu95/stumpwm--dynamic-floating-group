@@ -1,5 +1,7 @@
 # StumpWM - Dynamic Floating Group
 
+WARNING: Do not delete this repo, as the links to the media here are used in other articles and PRs.
+
 This repo is deprecated, and only serves as a storage for displaying videos.
 
 + Basic Movement
